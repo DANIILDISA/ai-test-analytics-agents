@@ -1,0 +1,66 @@
+[
+  {
+    "attempt_id": "a-ivanov-1",
+    "student_id": "ivanov",
+    "test_name": "Геометрия. Базовый тест",
+    "attempt_date": "2025-10-23 10:20:00",
+    "score_points": 2,
+    "score_max": 3,
+    "status": "Пройден",
+    "answers": [
+      {
+        "question_text": "Сколько сторон у треугольника?",
+        "question_type": "числовой ввод",
+        "given_answer": "3",
+        "correct_answer": "3",
+        "result": "верно"
+      },
+      {
+        "question_text": "Столица России?",
+        "question_type": "текстовый ввод",
+        "given_answer": "Москва",
+        "correct_answer": "Москва",
+        "result": "верно"
+      },
+      {
+        "question_text": "Выберите чётные числа",
+        "question_type": "множественный выбор",
+        "given_answer": "2,4",
+        "correct_answer": "2,4,6",
+        "result": "неверно"
+      }
+    ]
+  },
+  {
+    "attempt_id": "a-petrova-1",
+    "student_id": "petrova",
+    "test_name": "Геометрия. Базовый тест",
+    "attempt_date": "2025-10-24 09:00:00",
+    "score_points": 3,
+    "score_max": 3,
+    "status": "Пройден",
+    "answers": [
+      {
+        "question_text": "Сколько сторон у треугольника?",
+        "question_type": "числовой ввод",
+        "given_answer": "3",
+        "correct_answer": "3",
+        "result": "верно"
+      },
+      {
+        "question_text": "Столица России?",
+        "question_type": "текстовый ввод",
+        "given_answer": "Москва",
+        "correct_answer": "Москва",
+        "result": "верно"
+      },
+      {
+        "question_text": "Выберите чётные числа",
+        "question_type": "множественный выбор",
+        "given_answer": "2,4,6",
+        "correct_answer": "2,4,6",
+        "result": "верно"
+      }
+    ]
+  }
+]

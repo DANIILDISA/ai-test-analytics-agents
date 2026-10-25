@@ -1,0 +1,85 @@
+# TestAnalyzer configuration — non-secret tunables only.
+# Secrets (API keys) live in `.env` and are referenced here by env-var NAME only.
+# Hard rule: nothing about models, keys, paths or thresholds is hardcoded in Python.
+
+# --- Active LLM group ---------------------------------------------------------
+model_group: russian        # "foreign" (OpenRouter gateway) | "russian" (GigaChat/YandexGPT)
+# Default decided 2026-06-06: foreign (OpenRouter). NOTE: this sends answers to a
+# foreign gateway — revisit before real corporate data ships if data must stay in RF
+# (then switch to `russian`/GigaChat). See benchmarks/comparison.md + strict_results.md.
+
+models:
+  foreign:
+    provider: openrouter
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY      # value read from this env var, never inlined
+    # Verified present on OpenRouter (2026-06-05). Handles Russian; it is a
+    # reasoning model, so we disable reasoning to conserve tokens. Swap the slug
+    # freely: https://openrouter.ai/models
+    model: deepseek/deepseek-v4-flash
+    reasoning: false
+    max_tokens: 1024
+    temperature: 0.0
+  russian:                                # Phase 3 — GigaChat
+    provider: gigachat
+    api_key_env: GIGACHAT_CREDENTIALS
+    scope_env: GIGACHAT_SCOPE
+    # Servers: new gateway first (the only one that serves GigaChat-3-Ultra), the old
+    # host is the automatic fallback when the primary is unreachable (WinError 10054 etc.).
+    base_url: https://api.giga.chat/v1
+    fallback_base_url: https://gigachat.devices.sberbank.ru/api/v1
+    # Model ids: Lite=GigaChat-2, Pro=GigaChat-2-Pro, Max=GigaChat-2-Max, Ultra=GigaChat-3-Ultra
+    # (also selectable: GigaChat-3-Pro, GigaChat-3-Lightning). Owner decision: best model,
+    # tokens are not a concern. On error/unavailability the chain below is tried in order.
+    model: GigaChat-3-Ultra
+    fallback_models: [GigaChat-3-Pro, GigaChat-2-Max]   # benchmark chain: Ultra -> 3-Pro -> 2-Max
+    max_retries: 3                         # connect errors / timeouts / 429 / 5xx
+    retry_backoff: 1.0                     # seconds, doubled each retry
+    # 429 = rate limit (1 concurrent stream): same host, longer backoff, honours Retry-After.
+    rate_limit_retries: 6
+    rate_limit_backoff: 4.0
+    rate_limit_max_wait: 120.0
+    # GigaChat serves TLS via the Минцифры root CA. Dev-pragmatic default: skip
+    # verification. To harden: install the Минцифры CA and set verify_ssl: true.
+    verify_ssl: false
+    max_tokens: 1024
+    temperature: 0.0
+
+# --- Defaults of a new analysis (editable in the UI: Настройки -> Параметры анализа) ---
+analysis_defaults:
+  deep: true                  # «Глубокий анализ с ИИ»
+  max_llm_calls: 500          # cap on model calls per run (a limit, not a plan)
+  aspects: [why_failed, diagnosis, anomalies, recommendations]   # insight blocks to build
+
+# --- Analysis thresholds ------------------------------------------------------
+thresholds:
+  critical_correct_rate: 0.5   # question flagged "critical" below this correct rate
+  fast_factor: 0.3             # time < median * fast_factor  -> suspected lookup
+  slow_factor: 3.0             # time > median * slow_factor  -> suspected struggle
+  fuzzy_accept: 0              # 0 = fuzzy auto-accept OFF (near-miss = wrong on spelling/paronym
+                               #     tests; those go to the LLM). Raise to ~95 only for
+                               #     non-orthography content. exact/numeric/set are always on.
+  min_samples: 10              # min answers before a question can be flagged "critical" (small-sample guard)
+  pass_score: 75               # best score (%) from which a listener counts as "passed" (Word/PDF report)
+
+# --- Default paths (CLI flags override these) ---------------------------------
+paths:
+  input: ./data/samples
+  reference: ./data/etalon
+  output: ./output
+
+# --- Token-budget guardrails (project principle: code-first, LLM-last) --------
+token_budget:
+  # Advisory per-course safety cap (total tokens), not a cost target. The old Lite-era
+  # 30K figure throttled the big models; Ultra budget is ~5M tokens overall (see
+  # docs-internal/ПЛАН-финал.md), so 3M per course is a generous runaway-guard only.
+  foreign: 50000     # OpenRouter variant, per course
+  russian: 3000000   # GigaChat variant, per course
+
+# --- LLM batching (answers judged per call; 1 = no batching) ------------------
+# Default 1 (no batching). Batching is NOT verdict-neutral: judging answers in a
+# batch makes both engines markedly stricter (OpenRouter 13% / GigaChat 25% of
+# verdicts flip vs batch=1 — see benchmarks/strict/strict_results.md). batch=1 cost
+# is negligible, so we prefer per-answer-independent judgments. Raise only after
+# re-validating verdicts at that batch size against ground truth.
+llm_batch_size: 1

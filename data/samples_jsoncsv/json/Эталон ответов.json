@@ -1,0 +1,14 @@
+[
+  {
+    "test_name": "Демонстрационный тест",
+    "question_text": "Столица России?",
+    "raw_answer": "Москва",
+    "acceptable": ["Москва"]
+  },
+  {
+    "test_name": "Демонстрационный тест",
+    "question_text": "Выберите простое число",
+    "raw_answer": "7",
+    "acceptable": ["7"]
+  }
+]

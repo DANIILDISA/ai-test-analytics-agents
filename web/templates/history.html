@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>История анализов</title>
+  <style>
+    body { font-family: system-ui, Segoe UI, Arial, sans-serif; max-width: 960px;
+           margin: 40px auto; padding: 0 16px; color: #1c2330; line-height: 1.5; }
+    h1 { font-size: 1.6rem; } a { color: #2b6cb0; }
+    table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 0.95rem; }
+    th, td { border: 1px solid #d6dbe3; padding: 7px 10px; text-align: left; }
+    th { background: #f1f4f8; }
+    button { background: #2b6cb0; color: #fff; border: 0; border-radius: 6px;
+             padding: 10px 20px; font-size: 1rem; cursor: pointer; }
+    .muted { color: #7a8494; } .controls { margin: 12px 0; display: flex; gap: 16px; align-items: center; }
+  </style>
+</head>
+<body>
+  <div><a href="/">← Новый анализ</a></div>
+  <h1>История анализов</h1>
+
+  {% if not runs %}
+    <p class="muted">Пока нет сохранённых анализов. Запустите анализ — он появится здесь.</p>
+  {% else %}
+    <form action="/compare" method="post">
+      <p class="muted">Отметьте <b>два</b> анализа и нажмите «Сравнить».</p>
+      <table>
+        <tr><th></th><th>Дата</th><th>Название</th><th>Курс</th><th>Группа</th>
+            <th>Польз.</th><th>Вопр.</th><th>Ср. балл</th><th>Крит.</th><th></th></tr>
+        {% for r in runs %}
+          <tr>
+            <td><input type="checkbox" name="ids" value="{{ r.id }}"></td>
+            <td>{{ r.created_at }}</td>
+            <td>{{ r.name }}</td>
+            <td>{{ r.course_id }}</td>
+            <td>{{ r.model_group }}</td>
+            <td>{{ r.summary.total_users }}</td>
+            <td>{{ r.summary.total_questions }}</td>
+            <td>{{ r.summary.avg_score }}%</td>
+            <td>{{ r.summary.critical }}</td>
+            <td><a href="/download/{{ r.id }}.json">JSON</a></td>
+          </tr>
+        {% endfor %}
+      </table>
+      <div class="controls">
+        <label><input type="checkbox" name="narrate" value="1" checked> ИИ-комментарий к сравнению</label>
+        <button type="submit">Сравнить выбранные</button>
+      </div>
+    </form>
+  {% endif %}
+</body>
+</html>

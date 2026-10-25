@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Сравнение анализов</title>
+  <style>
+    body { font-family: system-ui, Segoe UI, Arial, sans-serif; max-width: 960px;
+           margin: 40px auto; padding: 0 16px; color: #1c2330; line-height: 1.5; }
+    h1 { font-size: 1.6rem; } h2 { font-size: 1.2rem; margin-top: 26px; } a { color: #2b6cb0; }
+    table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 0.95rem; }
+    th, td { border: 1px solid #d6dbe3; padding: 7px 10px; text-align: left; }
+    th { background: #f1f4f8; }
+    .cards { display: flex; flex-wrap: wrap; gap: 12px; margin: 12px 0; }
+    .card { background: #f6f8fb; border-radius: 8px; padding: 12px 16px; min-width: 150px; }
+    .card .v { font-size: 1.4rem; font-weight: 700; } .card .k { color: #5a6472; font-size: 0.85rem; }
+    .up { color: #2f855a; } .down { color: #b23b3b; }
+    .err { color: #b23b3b; } .muted { color: #7a8494; }
+  </style>
+</head>
+<body>
+  <div><a href="/history">← К истории</a></div>
+  <h1>Сравнение анализов</h1>
+
+  {% if error %}
+    <p class="err">{{ error }}</p>
+  {% else %}
+    {% set d = diff.summary_delta %}
+    <div class="cards">
+      <div class="card">
+        <div class="v {{ 'up' if d.avg_score >= 0 else 'down' }}">{{ '%+g'|format(d.avg_score) }}%</div>
+        <div class="k">Средний балл (Б−А)</div>
+      </div>
+      <div class="card">
+        <div class="v {{ 'down' if d.critical > 0 else 'up' }}">{{ '%+d'|format(d.critical) }}</div>
+        <div class="k">Критических вопросов</div>
+      </div>
+      <div class="card"><div class="v">{{ diff.common_count }}</div><div class="k">Общих вопросов</div></div>
+      <div class="card"><div class="v">{{ diff.stable_count }}</div><div class="k">Без изменений</div></div>
+    </div>
+
+    {% if narrative %}
+      <h2>ИИ-комментарий</h2>
+      <p>{{ narrative }}</p>
+    {% endif %}
+
+    {% if diff.improved %}
+      <h2 class="up">Улучшились ({{ diff.improved | length }})</h2>
+      <table>
+        <tr><th>Вопрос</th><th>Было</th><th>Стало</th><th>Δ</th></tr>
+        {% for it in diff.improved[:20] %}
+          <tr><td>{{ it.question_text }}</td>
+              <td>{{ (it.a_rate*100)|round|int }}%</td>
+              <td>{{ (it.b_rate*100)|round|int }}%</td>
+              <td class="up">{{ '%+d'|format((it.delta*100)|round|int) }}%</td></tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+
+    {% if diff.worsened %}
+      <h2 class="down">Ухудшились ({{ diff.worsened | length }})</h2>
+      <table>
+        <tr><th>Вопрос</th><th>Было</th><th>Стало</th><th>Δ</th></tr>
+        {% for it in diff.worsened[:20] %}
+          <tr><td>{{ it.question_text }}</td>
+              <td>{{ (it.a_rate*100)|round|int }}%</td>
+              <td>{{ (it.b_rate*100)|round|int }}%</td>
+              <td class="down">{{ '%+d'|format((it.delta*100)|round|int) }}%</td></tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+
+    {% if diff.new %}
+      <h2>Появились ({{ diff.new | length }})</h2>
+      <ul>{% for it in diff.new[:20] %}<li>{{ it.question_text }} — {{ (it.b_rate*100)|round|int }}% верных</li>{% endfor %}</ul>
+    {% endif %}
+    {% if diff.dropped %}
+      <h2>Пропали ({{ diff.dropped | length }})</h2>
+      <ul>{% for it in diff.dropped[:20] %}<li>{{ it.question_text }} — было {{ (it.a_rate*100)|round|int }}% верных</li>{% endfor %}</ul>
+    {% endif %}
+  {% endif %}
+</body>
+</html>

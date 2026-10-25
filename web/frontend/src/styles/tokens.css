@@ -1,0 +1,36 @@
+/* web/frontend/src/styles/tokens.css */
+/* КОРПУС design-system tokens. STRUCTURE is final; VALUES marked EXTRACT: are
+   provisional and replaced in Task 13 after reading the designer mockups. */
+:root {
+  /* --- Color (HSL channels, no hsl() wrapper so Tailwind can compose alpha) --- */
+  /* Extracted from designer references — КОРПУС deep royal blue ≈ #1f54e0. */
+  --korpus-blue: 222 80% 48%;
+  /* Hover/active brand blue (darker). */
+  --korpus-blue-hover: 222 80% 40%;
+  /* Positive delta green ≈ #249636 (from references). */
+  --korpus-up: 130 61% 36%;
+  /* Negative delta red ≈ #e0484d (provisional default — tiny area in refs; refine from prototype). */
+  --korpus-down: 359 70% 58%;
+
+  /* EXTRACT: page background. Provisional = #ffffff. */
+  --background: 0 0% 100%;
+  /* EXTRACT: primary text. Provisional = #1c2330. */
+  --foreground: 220 28% 15%;
+  /* EXTRACT: muted surface (cards/chips). Provisional = #f6f8fb. */
+  --muted: 213 38% 97%;
+  /* EXTRACT: muted text. Provisional = #5a6472. */
+  --muted-foreground: 217 12% 40%;
+  /* EXTRACT: hairline border. Provisional = #d6dbe3. */
+  --border: 217 20% 86%;
+  /* EXTRACT: card surface. Provisional = #ffffff. */
+  --card: 0 0% 100%;
+  --card-foreground: 220 28% 15%;
+
+  /* --- Typography --- */
+  /* EXTRACT: КОРПУС display/body font stack. Provisional = system-ui stack. */
+  --font-korpus: system-ui, "Segoe UI", Arial, sans-serif;
+
+  /* --- Shape / spacing --- */
+  /* EXTRACT: card/control corner radius. Provisional = 8px. */
+  --radius-korpus: 8px;
+}

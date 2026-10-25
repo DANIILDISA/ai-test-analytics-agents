@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TestAnalyzer — анализ результатов тестов</title>
+  <style>
+    body { font-family: system-ui, Segoe UI, Arial, sans-serif; max-width: 760px;
+           margin: 40px auto; padding: 0 16px; color: #1c2330; line-height: 1.5; }
+    h1 { font-size: 1.6rem; }
+    .hint { color: #5a6472; font-size: 0.92rem; margin-top: -6px; }
+    fieldset { border: 1px solid #d6dbe3; border-radius: 8px; margin: 18px 0; padding: 16px; }
+    legend { font-weight: 600; padding: 0 6px; }
+    label { display: block; margin: 8px 0 4px; }
+    input[type=file], select, input[type=number] { font-size: 1rem; }
+    .row { margin: 10px 0; }
+    .llm-box { background: #f6f8fb; border-radius: 6px; padding: 10px 12px; margin-top: 8px; }
+    button { background: #2b6cb0; color: #fff; border: 0; border-radius: 6px;
+             padding: 12px 22px; font-size: 1.05rem; cursor: pointer; }
+    button:hover { background: #245a96; }
+    .note { font-size: 0.85rem; color: #7a8494; }
+  </style>
+</head>
+<body>
+  <h1>Анализ результатов тестов</h1>
+  <p class="hint">Загрузите ответы пользователей и эталон, выберите параметры и запустите анализ.
+    <a href="/history">История анализов →</a></p>
+
+  <form action="/analyze" method="post" enctype="multipart/form-data">
+    <fieldset>
+      <legend>1. Файлы</legend>
+      <label for="answers">Ответы пользователей (Массив, .xlsx) — обязательно</label>
+      <input id="answers" type="file" name="answers" accept=".xlsx" required>
+
+      <label for="reference">Эталонные ответы (Эталон, .xlsx) — рекомендуется</label>
+      <input id="reference" type="file" name="reference" accept=".xlsx">
+    </fieldset>
+
+    <fieldset>
+      <legend>2. Параметры</legend>
+      <div class="row">
+        <label for="model_group">Группа нейросетей</label>
+        <select id="model_group" name="model_group">
+          <option value="foreign">Зарубежная (OpenRouter)</option>
+          <option value="russian">Российская (GigaChat)</option>
+        </select>
+        <span class="note">Используется только при глубоком анализе с ИИ.</span>
+      </div>
+
+      <div class="row">
+        <label for="mode">Что анализировать</label>
+        <select id="mode" name="mode">
+          <option value="all">Всё (ответы + попытки)</option>
+          <option value="answer">Только ответы</option>
+          <option value="time">Только попытки</option>
+        </select>
+      </div>
+
+      <div class="llm-box">
+        <label><input type="checkbox" name="use_llm" value="1"> Глубокий анализ с ИИ
+          (медленнее, расходует токены)</label>
+        <label for="max_llm_calls">Максимум обращений к ИИ на курс</label>
+        <input id="max_llm_calls" type="number" name="max_llm_calls" value="20" min="1" max="500">
+        <p class="note">Без этой галочки анализ выполняется только кодом — быстро и бесплатно
+          (0 токенов).</p>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>3. ИИ-выводы (дёшево)</legend>
+      <label><input type="checkbox" name="use_insights" value="1"> Включить ИИ-выводы по отчёту</label>
+      <span class="note">Один дешёвый запрос к ИИ по агрегатам (не по «сырым» ответам).
+        Можно включить даже без «глубокого анализа ответов».</span>
+      <div class="row">
+        <label>Какие разделы нужны:</label>
+        <label><input type="checkbox" name="insight_blocks" value="diagnosis"> Коротко о результатах</label>
+        <label><input type="checkbox" name="insight_blocks" value="why_failed"> Почему вопросы провалены</label>
+        <label><input type="checkbox" name="insight_blocks" value="recommendations"> Рекомендации</label>
+        <label><input type="checkbox" name="insight_blocks" value="anomalies"> Аномалии и риски</label>
+      </div>
+      <label for="insight_note">Дополнительные пожелания к выводам (необязательно)</label>
+      <input id="insight_note" type="text" name="insight_note" style="width:100%"
+             placeholder="например: оцени, подходит ли тест для входного контроля">
+    </fieldset>
+
+    <button type="submit">Запустить анализ</button>
+  </form>
+</body>
+</html>

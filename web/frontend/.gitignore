@@ -1,0 +1,9 @@
+# web/frontend/.gitignore
+node_modules/
+# dist/ is deliberately TRACKED: the product ships without Node, START.bat serves the
+# prebuilt bundle. Rebuild with `npm run build` and commit the whole folder.
+
+# TypeScript project-reference build artifacts (from `tsc -b` / IDE project builds)
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts

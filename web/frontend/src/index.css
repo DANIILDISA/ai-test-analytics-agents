@@ -1,0 +1,13 @@
+/* web/frontend/src/index.css */
+@import "./styles/tokens.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-korpus);
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}

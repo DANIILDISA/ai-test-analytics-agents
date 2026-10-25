@@ -1,0 +1,60 @@
+[
+  {
+    "attempt_id": "json-a1",
+    "student_id": "Иванов Иван",
+    "test_name": "Демонстрационный тест",
+    "attempt_date": "2026-01-15T10:00:00",
+    "score_points": 2,
+    "score_max": 2,
+    "score_pct": 100.0,
+    "status": "Пройден",
+    "is_abandoned": false,
+    "answers": [
+      {
+        "question_text": "Столица России?",
+        "question_type": "текстовый ввод",
+        "result_code": "lcnwu5wcgk",
+        "given_answer": "Москва",
+        "correct_answer": "Москва",
+        "is_answered": true
+      },
+      {
+        "question_text": "Выберите простое число",
+        "question_type": "единственный выбор",
+        "result_code": "lcnwu5wcgk",
+        "given_answer": "7",
+        "correct_answer": "7",
+        "is_answered": true
+      }
+    ]
+  },
+  {
+    "attempt_id": "json-a2",
+    "student_id": "Петров Пётр",
+    "test_name": "Демонстрационный тест",
+    "attempt_date": "2026-01-15T11:30:00",
+    "score_points": 1,
+    "score_max": 2,
+    "score_pct": 50.0,
+    "status": "Не пройден",
+    "is_abandoned": false,
+    "answers": [
+      {
+        "question_text": "Столица России?",
+        "question_type": "текстовый ввод",
+        "result_code": "r1s987zw3e",
+        "given_answer": "Санкт-Петербург",
+        "correct_answer": "Москва",
+        "is_answered": true
+      },
+      {
+        "question_text": "Выберите простое число",
+        "question_type": "единственный выбор",
+        "result_code": "lcnwu5wcgk",
+        "given_answer": "7",
+        "correct_answer": "7",
+        "is_answered": true
+      }
+    ]
+  }
+]

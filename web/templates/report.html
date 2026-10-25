@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Результаты анализа</title>
+  <style>
+    body { font-family: system-ui, Segoe UI, Arial, sans-serif; max-width: 960px;
+           margin: 40px auto; padding: 0 16px; color: #1c2330; line-height: 1.5; }
+    h1 { font-size: 1.6rem; } h2 { font-size: 1.2rem; margin-top: 28px; }
+    a { color: #2b6cb0; }
+    table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 0.95rem; }
+    th, td { border: 1px solid #d6dbe3; padding: 7px 10px; text-align: left; vertical-align: top; }
+    th { background: #f1f4f8; }
+    .cards { display: flex; flex-wrap: wrap; gap: 12px; margin: 12px 0; }
+    .card { background: #f6f8fb; border-radius: 8px; padding: 12px 16px; min-width: 120px; }
+    .card .v { font-size: 1.5rem; font-weight: 700; } .card .k { color: #5a6472; font-size: 0.85rem; }
+    .crit { color: #b23b3b; font-weight: 600; }
+    .err { color: #b23b3b; } .muted { color: #7a8494; }
+    pre { background: #f6f8fb; border-radius: 8px; padding: 14px; overflow-x: auto; white-space: pre-wrap; }
+    .topbar { display: flex; gap: 18px; align-items: center; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="/">← Новый анализ</a>
+    <a href="/history">История анализов</a>
+    {% if not error and rid %}<a href="/download/{{ rid }}.json">⬇ Скачать JSON</a>{% endif %}
+  </div>
+  <h1>Результаты анализа</h1>
+
+  {% if error %}
+    <p class="err">{{ error }}</p>
+  {% else %}
+
+    {% set commentary = (insights.commentary or {}) %}
+    {% set suggestions = (insights.suggestions or {}) %}
+
+    {% if commentary.blocks or commentary.custom %}
+      <h2>ИИ-выводы</h2>
+      {% for key, txt in commentary.blocks.items() %}
+        <h3>{{ BLOCK_TITLES.get(key, key) }}</h3>
+        <p>{{ txt }}</p>
+      {% endfor %}
+      {% if commentary.custom %}
+        <h3>По вашему запросу</h3>
+        <p>{{ commentary.custom }}</p>
+      {% endif %}
+    {% endif %}
+
+    {% if suggestions.gaps or suggestions.narrative %}
+      <h2>Рекомендации по данным</h2>
+      {% if suggestions.narrative %}<p>{{ suggestions.narrative }}</p>{% endif %}
+      {% if suggestions.gaps %}
+        <ul>
+          {% for g in suggestions.gaps %}<li>{{ g.message }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+    {% endif %}
+
+    {% set s = answer.summary or {} %}
+    {% if answer %}
+      <h2>Сводка по ответам</h2>
+      <div class="cards">
+        <div class="card"><div class="v">{{ s.total_users if s.total_users is not none else '—' }}</div><div class="k">Пользователей</div></div>
+        <div class="card"><div class="v">{{ s.total_questions if s.total_questions is not none else '—' }}</div><div class="k">Вопросов</div></div>
+        <div class="card"><div class="v">{{ s.avg_score if s.avg_score is not none else '—' }}%</div><div class="k">Средний балл</div></div>
+        <div class="card"><div class="v">{{ s.real_attempts if s.real_attempts is not none else '—' }}</div><div class="k">Реальных попыток</div></div>
+        <div class="card"><div class="v">{{ s.abandoned if s.abandoned is not none else '—' }}</div><div class="k">Брошенных</div></div>
+      </div>
+
+      {% set crit = (answer.questions or []) | selectattr('critical') | sort(attribute='correct_rate') | list %}
+      <h2>Критические вопросы <span class="muted">({{ crit | length }})</span></h2>
+      {% if crit %}
+        <table>
+          <tr><th>Доля верных</th><th>Вопрос</th><th>Частые ошибки</th></tr>
+          {% for q in crit[:20] %}
+            <tr>
+              <td class="crit">{{ (q.correct_rate * 100) | round(0, 'floor') | int }}%</td>
+              <td>{{ q.question_text }}</td>
+              <td>
+                {% for e in (q.common_errors or [])[:3] %}
+                  ✗ {{ e.answer }} <span class="muted">(×{{ e.count }})</span><br>
+                {% endfor %}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% else %}
+        <p class="muted">Критических вопросов не обнаружено.</p>
+      {% endif %}
+    {% endif %}
+
+    {% if time %}
+      <h2>Анализ попыток</h2>
+      <p class="muted">{{ time.note }}</p>
+      <p>Доля брошенных попыток: <b>{{ time.abandoned_rate }}%</b></p>
+      {% set anomalies = time.attempt_anomalies or [] %}
+      {% if anomalies %}
+        <table>
+          <tr><th>Студент</th><th>Попыток</th><th>Балл (мин→макс)</th></tr>
+          {% for a in anomalies[:15] %}
+            <tr><td>{{ a.student_id }}</td><td>{{ a.attempts }}</td><td>{{ a.score_min }} → {{ a.score_max }}%</td></tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+    {% endif %}
+
+    {% if warnings %}
+      <h2>Предупреждения <span class="muted">({{ warnings | length }})</span></h2>
+      <ul>{% for w in warnings[:20] %}<li class="muted">{{ w }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    <h2>Текстовый отчёт</h2>
+    <pre>{{ text }}</pre>
+  {% endif %}
+</body>
+</html>

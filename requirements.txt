@@ -1,0 +1,40 @@
+# Core (parser increment)
+pydantic>=2.13
+pydantic-settings>=2.14
+openpyxl>=3.1
+
+# Phase 1 (console pipeline on OpenRouter)
+openai>=2.0               # OpenRouter (foreign group) via the OpenAI-compatible API
+pyyaml>=6.0               # config.yaml parsing
+python-dotenv>=1.0        # .env loading
+
+# Phase 2 (reference enrichment)
+rapidfuzz>=3.14           # fuzzy reference matching (exact/numeric/set + fuzzy ratio)
+
+# Phase 3 (russian group — GigaChat)
+gigachat==0.2.1           # official Sber SDK: OAuth refresh + Минцифры CA bundle
+
+# Phase 4 (browser UI prototype)
+fastapi>=0.115          # web app
+uvicorn>=0.30           # ASGI server
+python-multipart>=0.0.9 # file uploads
+jinja2>=3.1             # server-rendered templates
+
+# Reports (Word export; PDF goes through the browser already on the machine)
+python-docx>=1.1        # .docx report (pulls lxml)
+
+# Dev / testing
+pytest>=8.0
+
+# --- Verified-working set (clean install confirmed 2026-06-06) -----------------
+# Pin to these exact versions for a reproducible environment if needed:
+#   pydantic==2.13.4  pydantic-settings==2.14.1  openpyxl==3.1.5
+#   openai==2.41.0    pyyaml==6.0.3              python-dotenv==1.2.2
+#   rapidfuzz==3.14.5 gigachat==0.2.1           pytest==9.0.3
+# tests/test_imports_smoke.py fails loudly if any of these are missing from the venv.
+
+# Added in later increments:
+# langgraph>=0.2          # pipeline orchestration
+# fastapi>=0.110          # API (Phase 4)
+# uvicorn>=0.29
+# typer>=0.12             # nicer CLI (optional)
